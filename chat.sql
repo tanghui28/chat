@@ -9,7 +9,7 @@ CREATE TABLE user(
   phone CHAR(11) NOT NULL,
   avatar VARCHAR NOT NULL DEFAULT 'male.png',
   createAt BIGINT NOT NULL,
-  UPDATEAT BIGINT NOT NULL
+  updateAt BIGINT NOT NULL
 )
 #好友关系表
 CREATE  TABLE user_friend(
