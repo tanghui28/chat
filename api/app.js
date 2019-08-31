@@ -35,7 +35,6 @@ function addMapping(router,mapping) {
     } else if (url.startsWith('POST')) {
 
       let path = url.slice(5);
-      console.log(path)
       router.post(path, mapping[url])
 
     }
@@ -50,7 +49,7 @@ function addMapping(router,mapping) {
 function addControllers(router) {
 
   let files = fs.readdirSync(__dirname + '/controllers');
-  console.log(files);
+
   // 过滤非js文件
   let js_files = files.filter(f => {
     return f.endsWith('.js');
@@ -58,17 +57,22 @@ function addControllers(router) {
 
   for (let f of js_files) {
     let mapping = require(__dirname + '/controllers/' + f);
-    console.log(mapping)
     addMapping(router,mapping)
   }
 
 }
 
-// 扫描所有api文件
+
+
+// 扫描所有api文件并运行
 addControllers(router);
 
 // 启动服务
 const app = new koa();
+app.use(async(ctx,next)=>{
+  console.log(ctx);
+  await next();
+})
 
 app.use(bodyParser());                //必须在router之前注册到app对象上
 app.use(router.routes());

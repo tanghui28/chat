@@ -17,7 +17,7 @@ let fn_login = async (ctx, next) => {
 
   let uname = ctx.request.body.uname || "",
     password = ctx.request.body.password || "";
-
+    
   let md5 = crypto.createHash('md5');
 
   // 数据库查询
