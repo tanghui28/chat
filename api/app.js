@@ -62,17 +62,13 @@ function addControllers(router) {
 
 }
 
-
-
 // 扫描所有api文件并运行
 addControllers(router);
 
+
+
 // 启动服务
 const app = new koa();
-app.use(async(ctx,next)=>{
-  console.log(ctx);
-  await next();
-})
 
 app.use(bodyParser());                //必须在router之前注册到app对象上
 app.use(router.routes());

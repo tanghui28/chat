@@ -33,11 +33,25 @@ let fn_register = async (ctx,next) => {
       }
     });
 
-    if (hasUser.length > 0) {
+    let hasPhone =  await userModel.findAll({
+      attributes: ['phone'],
+      where: {
+        phone
+      }
+    });
+
+    if (hasUser.length > 0 ) {
       ctx.response.body = JSON.stringify({
         success: false,
         data: null,
         info: '用户名已存在!',
+        title: '用户注册'
+      });
+    }else if(hasPhone.length >0){
+      ctx.response.body = JSON.stringify({
+        success: false,
+        data: null,
+        info: '手机号已被注册!',
         title: '用户注册'
       });
     } else { 
