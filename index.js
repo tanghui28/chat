@@ -18,6 +18,9 @@ const cors = require('koa2-cors');
 //处理解析post请求的 请求主体 模块
 const bodyParser = require('koa-bodyparser');
 
+//处理静态文件模块
+const static = require('koa-static');
+
 // 数据库 orm 映射模块
 // const Sequelize = require('sequelize');
 
@@ -48,7 +51,7 @@ function addMapping(router,mapping) {
 // 定义扫描中间件函数
 function addControllers(router) {
 
-  let files = fs.readdirSync(__dirname + '/controllers');
+  let files = fs.readdirSync(__dirname + '/api/controllers');
 
   // 过滤非js文件
   let js_files = files.filter(f => {
@@ -56,7 +59,7 @@ function addControllers(router) {
   })
 
   for (let f of js_files) {
-    let mapping = require(__dirname + '/controllers/' + f);
+    let mapping = require(__dirname + '/api/controllers/' + f);
     addMapping(router,mapping)
   }
 
@@ -97,10 +100,10 @@ server.listen(3000)
 
 
 app.use(bodyParser());                //必须在router之前注册到app对象上
+app.use(static(__dirname+'./images'))
 app.use(router.routes());
 app.use(cors());
 // app.listen(3000);
 
 
-console.log(process)
 
