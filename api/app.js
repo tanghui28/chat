@@ -67,10 +67,38 @@ addControllers(router);
 
 
 
-// 启动服务
+// 创建koa服务
 const app = new koa();
+
+const server = require('http').Server(app.callback());
+// 启动websocket服务
+const io = require('socket.io')(server);
+io.on('connection', socket => {
+  console.log(socket)
+  setTimeout(() => {
+    socket.emit('message', [1,2,3])
+  }, 3000);
+
+
+  socket.on('top', data => { 
+    console.log(data)
+  })
+
+
+  socket.on('disconnect', data => { 
+    console.log('用户断开连接'+data)
+  })
+
+})
+
+server.listen(3000)
+
+
+
 
 app.use(bodyParser());                //必须在router之前注册到app对象上
 app.use(router.routes());
 app.use(cors());
-app.listen(3000);
+// app.listen(3000);
+
+
