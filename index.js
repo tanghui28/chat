@@ -98,12 +98,11 @@ server.listen(3000)
 
 
 
-
+app.use(static(__dirname+'/public'))
 app.use(bodyParser());                //必须在router之前注册到app对象上
-app.use(static(__dirname+'./images'))
 app.use(router.routes());
 app.use(cors());
 // app.listen(3000);
 
-
+console.log(__dirname)
 
