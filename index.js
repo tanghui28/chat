@@ -104,5 +104,4 @@ app.use(router.routes());
 app.use(cors());
 // app.listen(3000);
 
-console.log(__dirname)
 
