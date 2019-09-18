@@ -13,6 +13,9 @@ const jwt = require('jsonwebtoken');
 const userModel = require('../model/user');
 
 
+const IP = require('../getIP');
+
+
 let fn_login = async (ctx, next) => {
 
   let uname = ctx.request.body.uname || "",
@@ -45,6 +48,7 @@ let fn_login = async (ctx, next) => {
     );
     let data = canLogin[0]['dataValues'];
     data.token = token;
+    data.avatar = "http://"+IP+':3000/images/'+data.avatar;
     ctx.response.body = JSON.stringify({
       success: true,
       data: data,
