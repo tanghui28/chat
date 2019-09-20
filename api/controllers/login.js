@@ -11,9 +11,46 @@ const jwt = require('jsonwebtoken');
 
 //引入 user model
 const userModel = require('../model/user');
+// 引入user_friend model
+const userFriendModel = require('../model/user_friend');
 
 
 const IP = require('../getIP');
+
+let getFriendDetail = async friend_id => {
+
+  let friendDetail = await userModel.findAll({
+    attributes: ['uname', 'avatar'],
+    where: {
+      user_id: friend_id
+    },
+    raw: true
+  });
+  return friendDetail[0];
+
+}
+
+let getUserFriendList = async user_id => { 
+
+  let friendList = await userFriendModel.findAll({
+    attributes: ['friend_id', 'friend_remark', 'friend_message'],
+    where: {
+      user_id
+    },
+    raw:true
+  })
+
+  for (let k = 0; k < friendList.length;k++ ) { 
+    let item = friendList[k];
+    let friendDetail = await getFriendDetail(item.friend_id);
+    friendList[k] = { ...item, ...friendDetail };
+    friendList[k].friend_remark = friendList[k].friend_remark === "" ? friendList[k]['uname'] : friendList[k].friend_remark;
+    friendList[k].avatar = "http://" + IP + ':3000/images/' + friendList[k].avatar;
+  }
+
+  return friendList;
+
+}
 
 
 let fn_login = async (ctx, next) => {
@@ -48,7 +85,10 @@ let fn_login = async (ctx, next) => {
     );
     let data = canLogin[0]['dataValues'];
     data.token = token;
-    data.avatar = "http://"+IP+':3000/images/'+data.avatar;
+    data.avatar = "http://" + IP + ':3000/images/' + data.avatar;
+    // 查询好友列表
+    let friendList = await getUserFriendList(data.user_id);
+    data.friendList = friendList;
     ctx.response.body = JSON.stringify({
       success: true,
       data: data,

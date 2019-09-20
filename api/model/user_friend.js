@@ -26,5 +26,5 @@ let userFriendModel = sequelize.define('user_friend',
   }
 );
 
-module.exports = userModel;
+module.exports = userFriendModel;
 
