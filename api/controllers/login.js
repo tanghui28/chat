@@ -4,6 +4,9 @@ const crypto = require("crypto");
 // token模块
 const jwt = require('jsonwebtoken');
 
+// 引入 pinyin
+const pinyin = require('pinyin');
+
 
 //处理数据库
 // const Sequelize = require('sequelize');
@@ -20,7 +23,7 @@ const IP = require('../getIP');
 let getFriendDetail = async friend_id => {
 
   let friendDetail = await userModel.findAll({
-    attributes: ['uname', 'avatar'],
+    attributes: ['uname', 'avatar','phone'],
     where: {
       user_id: friend_id
     },
@@ -40,15 +43,46 @@ let getUserFriendList = async user_id => {
     raw:true
   })
 
+  let letter = [];
   for (let k = 0; k < friendList.length;k++ ) { 
     let item = friendList[k];
     let friendDetail = await getFriendDetail(item.friend_id);
     friendList[k] = { ...item, ...friendDetail };
     friendList[k].friend_remark = friendList[k].friend_remark === "" ? friendList[k]['uname'] : friendList[k].friend_remark;
     friendList[k].avatar = "http://" + IP + ':3000/images/' + friendList[k].avatar;
+
+    letter.push(
+      pinyin(friendList[k].friend_remark.slice(0,1),{style:pinyin.STYLE_FIRST_LETTER})[0][0]
+    );
+
+
   }
 
-  return friendList;
+  letter = [...new Set(letter)].sort();
+
+
+  let result = [];
+  letter.forEach((item)=>{
+    result.push({
+      title:item,
+      data:[]
+    })
+  })
+
+  for(let i = 0; i<result.length; i++){
+    friendList.forEach((item)=>{
+
+      let first = pinyin(item.friend_remark.slice(0,1),{style:pinyin.STYLE_FIRST_LETTER})[0][0];
+
+      if(result[i].title == first){
+
+        result[i]['data'].push(item)
+
+      }
+
+    })
+  }
+  return result;
 
 }
 
