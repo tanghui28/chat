@@ -103,7 +103,7 @@ let fn_login = async (ctx, next) => {
     }
   })
 
-  // 查询到存在此用户  开始签发token
+  // 查询到存在此用户  签发token
   if (canLogin.length > 0) {
 
     // 秘钥
@@ -121,8 +121,10 @@ let fn_login = async (ctx, next) => {
     data.token = token;
     data.avatar = "http://" + IP + ':3000/images/' + data.avatar;
     // 查询好友列表
-    let friendList = await getUserFriendList(data.user_id);
-    data.friendList = friendList;
+    await getUserFriendList(data.user_id).then(res => { 
+      data.friendList = res;
+    });
+    
     ctx.response.body = JSON.stringify({
       success: true,
       data: data,
