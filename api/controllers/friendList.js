@@ -85,7 +85,7 @@ let getUserFriendList = async user_id => {
 let fn_friendList = async (ctx, next) => { 
   
   let token = ctx.request.header.token;
-  console.log(token);
+  // console.log(token);
   if (token) {
 
     // 秘钥

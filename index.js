@@ -78,9 +78,16 @@ const server = require('http').Server(app.callback());
 const io = require('socket.io')(server);
 io.on('connection', socket => {
   console.log(socket)
-  setTimeout(() => {
+  // setTimeout(() => {
+  //   socket.emit('message', [1,2,3])
+  // }, 3000);
+  setInterval(() => {
     socket.emit('message', [1,2,3])
-  }, 3000);
+  }, 5000);
+
+  socket.on('connect',data=>{
+    console.log(data)
+  })
 
 
   socket.on('top', data => { 
