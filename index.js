@@ -23,6 +23,8 @@ const bodyParser = require('koa-bodyparser');
 //处理静态文件模块
 const static = require('koa-static');
 
+let userFriendModel = require('./api/model/user_friend');
+
 // 数据库 orm 映射模块
 // const Sequelize = require('sequelize');
 
@@ -75,76 +77,6 @@ addControllers(router);
 // 创建koa服务
 const app = new koa();
 
-// const server = require('http').Server(app.callback());
-
-// const userModel = require('./api/model/user');
-// // 启动websocket服务
-// const io = require('socket.io')(server);
-// io.on('connection', async socket => {
-//   console.log(socket)
-//   const secret = 'tanghui';
-//   await jwt.verify(socket.handshake.query.token, secret, async(err,decode) => { 
-
-//     if (!err) { 
-
-//       console.log(decode.user_id);
-//       await userModel.update(
-//         {
-//           online: 1,
-//           socketId: socket.id
-//         },
-//         {
-//           where: {
-//             'user_id': 1
-//           }
-//         }
-//       ).then(ok => { 
-//         console.log(ok)
-//       }).catch(err => { 
-//         console.log(err)
-//       })
-
-//       let res = await userModel.findOne({
-//         attributes: ['online', 'socketId'],
-//         where: {
-//           user_id: decode.user_id
-//         },
-//         raw:true
-//       })
-//       console.log(res);
-
-
-//     }
-
-//   })
-
-//   setInterval(() => {
-//     socket.emit('message', [1,2,3])
-//   }, 15000);
-
-//   socket.on('connect',data=>{
-//     console.log(data)
-//   })
-
-
-//   socket.on('top', data => { 
-//     console.log(data)
-//   })
-
-
-//   socket.on('disconnect', data => { 
-//     console.log('用户断开连接'+data)
-//   })
-
-// })
-
-// server.listen(3000)
-
-
-
-
-
-
 app.use(static(__dirname+'/public'))
 app.use(bodyParser());                //必须在router之前注册到app对象上
 app.use(router.routes());
@@ -152,40 +84,64 @@ app.use(cors());
 let sp = app.listen(3000);
 
 
-let list = [];          //在线客户端列表
+
+
+let list = [];          //websocket在线客户端列表
 const WebSocket = require('ws');
 const wss = new WebSocket.Server({
   server: sp
 })
 wss.on('connection', (ws, req) => {
   console.log('已连接');
-  list.push(ws);
-  console.log(list);
+ 
   let params = querystring.parse( req.url.slice(2) );
   // { 
   //   user_id:1
   // }
 
-  // ws.onmessage = (msg) => { 
-   
-  // }
-  ws.on('message', (data) => { 
+  list[params.user_id] = ws;
+  console.log(list);
+  ws.on('message', async(data) => { 
     
     if (data === "ping") { 
-      console.log(data);
+      // console.log(data);
       ws.send('ping');
       return;
     }
     data = JSON.parse(data);
     console.log(data);
-    // {from:'Client A', to:'Client B', body: 'hello'}
+    // {from:1, to:6, body: 'hello'}
+    if(list[data.to]){
+      console.log(data.to+'用户在线');
+      list[data.to].send(JSON.stringify(data));
+    }else {
+      //用户不在线 , 存储消息
+      console.log(data.to+'用户离线,存储消息');
+      let res = await userFriendModel.findOne({
+        attributes:['friend_message'],
+        where:{
+          user_id:data.from,
+          friend_id:data.to
+        }
+      })
+      let friend_message = res.friend_message+data.body;
+      await userFriendModel.update({
+        friend_message
+      },{
+        where:{
+          user_id:data.from,
+          friend_id:data.to
+        }
+      })
+
+    }
 
    
   })
 
   ws.on('close', () => { 
     console.log('用户断开连接')
-    _.pull(list, ws);
+    list[params.user_id] = null;
   })
 
 })
