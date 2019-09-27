@@ -1,6 +1,6 @@
 set names utf8;
 DROP DATABASE IF  EXISTS chat;
-CREATE DATABASE chat charset=utf8;
+CREATE DATABASE chat charset=utf8mb4;
 USE chat;
 #用户表
 CREATE TABLE user(

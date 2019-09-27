@@ -47,7 +47,7 @@ let getUserFriendList = async user_id => {
     friendList[k].avatar = "http://" + IP + ':3000/images/' + friendList[k].avatar;
 
     letter.push(
-      pinyin(friendList[k].friend_remark.slice(0, 1), { style: pinyin.STYLE_FIRST_LETTER })[0][0]
+      pinyin(friendList[k].friend_remark.slice(0, 1), { style: pinyin.STYLE_FIRST_LETTER })[0][0].toUpperCase()
     );
 
 
@@ -67,7 +67,7 @@ let getUserFriendList = async user_id => {
   for (let i = 0; i < result.length; i++) {
     friendList.forEach((item) => {
 
-      let first = pinyin(item.friend_remark.slice(0, 1), { style: pinyin.STYLE_FIRST_LETTER })[0][0];
+      let first = pinyin(item.friend_remark.slice(0, 1), { style: pinyin.STYLE_FIRST_LETTER })[0][0].toUpperCase();
 
       if (result[i].title == first) {
 

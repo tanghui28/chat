@@ -124,7 +124,8 @@ wss.on('connection', (ws, req) => {
           friend_id:data.to
         }
       })
-      let friend_message = res.friend_message+data.body;
+      let friend_message = res.friend_message.length > 0 ? res.friend_message + ',' : res.friend_message;
+      friend_message += data.body;
       await userFriendModel.update({
         friend_message
       },{
