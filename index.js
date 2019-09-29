@@ -1,3 +1,4 @@
+"use strict";  
 const _ = require('lodash');
 const querystring = require('querystring');
 // 文件读取模块
@@ -21,7 +22,7 @@ const cors = require('koa2-cors');
 const bodyParser = require('koa-bodyparser');
 
 //处理静态文件模块
-const static = require('koa-static');
+const static1 = require('koa-static');
 
 let userFriendModel = require('./api/model/user_friend');
 
@@ -77,7 +78,7 @@ addControllers(router);
 // 创建koa服务
 const app = new koa();
 
-app.use(static(__dirname+'/public'))
+app.use(static1(__dirname+'/public'))
 app.use(bodyParser());                //必须在router之前注册到app对象上
 app.use(router.routes());
 app.use(cors());
