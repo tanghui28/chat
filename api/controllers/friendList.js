@@ -38,6 +38,14 @@ let getUserFriendList = async user_id => {
     raw: true
   })
 
+  await userFriendModel.update({
+    friend_message:''
+  }, {
+      where: {
+        user_id
+      }
+  })
+
   let letter = [];
   for (let k = 0; k < friendList.length; k++) {
     let item = friendList[k];

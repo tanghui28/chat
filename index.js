@@ -121,8 +121,8 @@ wss.on('connection', (ws, req) => {
       let res = await userFriendModel.findOne({
         attributes:['friend_message'],
         where:{
-          user_id:data.from,
-          friend_id:data.to
+          user_id:data.to,
+          friend_id:data.from
         }
       })
       let friend_message = res.friend_message.length > 0 ? res.friend_message + ',' : res.friend_message;
@@ -131,8 +131,8 @@ wss.on('connection', (ws, req) => {
         friend_message
       },{
         where:{
-          user_id:data.from,
-          friend_id:data.to
+          user_id:data.to,
+          friend_id:data.from
         }
       })
 
