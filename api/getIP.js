@@ -12,3 +12,4 @@ function getIPAddress(){
 }
 const LOCAL_IP = getIPAddress();
 module.exports = LOCAL_IP;
+// module.exports = "47.111.1.1";
