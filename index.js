@@ -93,15 +93,13 @@ const wss = new WebSocket.Server({
   server: sp
 })
 wss.on('connection', (ws, req) => {
-  console.log('已连接');
- 
+
   let params = querystring.parse( req.url.slice(2) );
   // { 
   //   user_id:1
   // }
 
   list[params.user_id] = ws;
-  console.log(list);
   ws.on('message', async(data) => { 
     
     if (data === "ping") { 
@@ -109,15 +107,57 @@ wss.on('connection', (ws, req) => {
       ws.send('ping');
       return;
     }
+    //更新好友
+    if(data.startsWith('updateFriend')){
+      userFriendModel.removeAttribute('id');
+      let friend_id = data.slice(12);
+      let res = await userFriendModel.findOne({
+        where:{
+          user_id:params.user_id,
+          friend_id:data.slice(12)
+        },
+        raw:true
+      })
+      if(res){
+        return;
+      }
+      let now = Date.now();
+      
+      await userFriendModel.bulkCreate([
+        {
+            user_id:params.user_id,
+            friend_id,
+            friend_remark:'',
+            friend_message:'',
+            createdAt:now
+        },
+        {
+            user_id:friend_id,
+            friend_id:params.user_id,
+            friend_remark:'',
+            friend_message:'',
+            createdAt:now
+        },
+      ])
+      //向客户端发送更新好友列表提示
+      if(list[params.user_id]){
+        list[params.user_id].send('updateFriend')
+      }
+      if(list[friend_id]){
+        list[friend_id].send('updateFriend')
+      }
+      return;
+    }
+    // 收发消息
     data = JSON.parse(data);
-    console.log(data);
+
     // {from:1, to:6, body: 'hello'}
     if(list[data.to]){
-      console.log(data.to+'用户在线');
+      // console.log(data.to+'用户在线');
       list[data.to].send(JSON.stringify(data));
     }else {
       //用户不在线 , 存储消息
-      console.log(data.to+'用户离线,存储消息');
+      // console.log(data.to+'用户离线,存储消息');
       let res = await userFriendModel.findOne({
         attributes:['friend_message'],
         where:{
@@ -142,7 +182,7 @@ wss.on('connection', (ws, req) => {
   })
 
   ws.on('close', () => { 
-    console.log('用户断开连接')
+    // console.log('用户断开连接')
     list[params.user_id] = null;
   })
 
