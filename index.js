@@ -98,7 +98,6 @@ wss.on('connection', (ws, req) => {
   // { 
   //   user_id:1
   // }
-
   list[params.user_id] = ws;
   ws.on('message', async(data) => { 
     
@@ -153,8 +152,13 @@ wss.on('connection', (ws, req) => {
 
     // {from:1, to:6, body: 'hello'}
     if(list[data.to]){
-      // console.log(data.to+'用户在线');
-      list[data.to].send(JSON.stringify(data));
+      console.log(data.to+'用户在线');
+      list[data.to].send(JSON.stringify(data),err=>{
+        if(err){
+          console.log('发送错误')
+        }
+        
+      });
     }else {
       //用户不在线 , 存储消息
       // console.log(data.to+'用户离线,存储消息');
