@@ -186,7 +186,7 @@ wss.on('connection', (ws, req) => {
   })
 
   ws.on('close', () => { 
-    // console.log('用户断开连接')
+
     list[params.user_id] = null;
   })
 
